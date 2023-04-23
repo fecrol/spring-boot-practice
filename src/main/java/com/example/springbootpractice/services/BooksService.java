@@ -1,6 +1,8 @@
 package com.example.springbootpractice.services;
 
 import com.example.springbootpractice.data.Books;
+import com.example.springbootpractice.exceptions.HttpStatusBadRequest;
+import com.example.springbootpractice.exceptions.HttpStatusNotFound;
 import com.example.springbootpractice.models.Book;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,15 +29,14 @@ public class BooksService {
     }
 
     public ResponseEntity<Object> getBookById(String bookId) {
-        Optional<Book> book = books.findById(bookId);
+        Book book = books.findById(bookId)
+                .orElseThrow(() ->
+                        new HttpStatusNotFound("book with id of " + bookId + " not found")
+                );
 
-        return book.isPresent() ?
-                ResponseEntity
+        return ResponseEntity
                         .status(HttpStatus.OK)
-                        .body(book) :
-                ResponseEntity.
-                        status(HttpStatus.NOT_FOUND).
-                        body(Map.of("error", "book with id of " + bookId + " not found"));
+                        .body(book);
     }
 
     public ResponseEntity<Object> addNewBook(Map<String, String> reqBody) {
@@ -43,9 +44,7 @@ public class BooksService {
 
         for(String bookField : bookFields) {
             if(!reqBody.containsKey(bookField)) {
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", bookField + " field required"));
+                throw new HttpStatusBadRequest(bookField + " field required");
             }
         }
 
@@ -68,9 +67,7 @@ public class BooksService {
 
     public ResponseEntity<Object> deleteBook(String bookId) {
         if(!books.existsById(bookId)) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", "book with id of " + bookId + " not found"));
+            throw new HttpStatusNotFound("book with id of " + bookId + " not found");
         }
 
         books.delete(bookId);
@@ -81,11 +78,9 @@ public class BooksService {
 
     public ResponseEntity<Object> updateBook(String bookId, Map<String, String> reqBody) {
         Book book = books.findById(bookId)
-                .orElse(null);
-
-        if(book == null) return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(Map.of("error", "book with id of " + bookId + " not found"));
+                .orElseThrow(() ->
+                    new HttpStatusNotFound("book with id of " + bookId + " not found")
+                );
 
         String title = reqBody.get("title");
         String author = reqBody.get("author");
