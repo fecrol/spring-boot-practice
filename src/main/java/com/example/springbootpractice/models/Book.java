@@ -1,6 +1,7 @@
 package com.example.springbootpractice.models;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Book {
 
@@ -8,16 +9,16 @@ public class Book {
     private String title;
     private String author;
     private String publisher;
-    private LocalDate releaseDate;
+    private LocalDate publicationDate;
 
     public Book() {}
 
-    public Book(String id, String title, String author, String publisher, LocalDate releaseDate) {
+    public Book(String id, String title, String author, String publisher, LocalDate publicationDate) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.publisher = publisher;
-        this.releaseDate = releaseDate;
+        this.publicationDate = publicationDate;
     }
 
     public String getId() {
@@ -52,12 +53,12 @@ public class Book {
         this.publisher = publisher;
     }
 
-    public LocalDate getReleaseDate() {
-        return releaseDate;
+    public String getPublicationDate() {
+        return publicationDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
+    public void setPublicationDate(LocalDate publicationDate) {
+        this.publicationDate = publicationDate;
     }
 
     @Override
@@ -67,7 +68,7 @@ public class Book {
                 ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
                 ", publisher='" + publisher + '\'' +
-                ", releaseDate=" + releaseDate +
+                ", releaseDate=" + publicationDate +
                 '}';
     }
 }
