@@ -7,10 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class BooksService {
@@ -80,5 +77,31 @@ public class BooksService {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(Map.of("message", "book with id of " + bookId + " deleted successfully"));
+    }
+
+    public ResponseEntity<Object> updateBook(String bookId, Map<String, String> reqBody) {
+        Book book = books.findById(bookId)
+                .orElse(null);
+
+        if(book == null) return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "book with id of " + bookId + " not found"));
+
+        String title = reqBody.get("title");
+        String author = reqBody.get("author");
+        String publisher = reqBody.get("publisher");
+        String publicationDate = reqBody.get("publicationDate");
+
+        if(title != null && title.length() > 0) book.setTitle(title);
+        if(author != null && author.length() > 0) book.setAuthor(author);
+        if(publisher != null && publisher.length() > 0) book.setPublisher(publisher);
+        if(publicationDate != null && publicationDate.length() > 0) {
+            LocalDate pbDate = LocalDate.parse(publicationDate);
+            book.setPublicationDate(pbDate);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(book);
     }
 }
